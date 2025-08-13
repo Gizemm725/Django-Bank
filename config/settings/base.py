@@ -3,7 +3,8 @@
 from pathlib import Path
 from dotenv import load_dotenv
 from os import getenv, path
-
+from loguru import logger 
+from datetime import timedelta 
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -89,8 +90,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': getenv("POSTGRES_DB"),
+        'USER': getenv("POSTGRES_USER"),
+        'PASSWORD': getenv("POSTGRES_PASSWORD"),
+        'HOST': getenv("POSTGRES_HOST"),
+        'PORT': getenv("POSTGRES_PORT"),
     }
 }
 
@@ -138,3 +143,58 @@ STATIC_ROOT = str(BASE_DIR/"staticfiles")
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+AUTH_USER_MODEL = "user_auth.User"
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS":"drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE":"NextGen Bank API",
+    "DESCRIPTION":"An API built for a banking system",
+    "VERSION":"1.0.0",
+    "SERVE_INCLUDE_SCHEMA":False,
+    "LICENSE":{
+        "name":"MIT License",
+        "url":"https://opensource.org/license/mit/",
+    }
+}
+
+
+LOGGING_CONFIG = None
+LOGURU_LOGGING = {
+    "handlers": [
+        {
+            "sink": BASE_DIR / "logs/debug.log",
+            "level": "DEBUG",
+            "filter": lambda record: record["level"].no <= logger.level("WARNING").no,
+            "format": "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level:<8} | {name}:{function}:{line} - {message}",
+            "rotation": "10MB",
+            "retention": "30 days",
+            "compression": "zip",
+        },
+        {
+            "sink": BASE_DIR / "logs/error.log",
+            "level": "ERROR",
+            "filter": lambda record: record["level"].no <= logger.level("WARNING").no,
+            "format": "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level:<8} | {name}:{function}:{line} - {message}",
+            "rotation": "10MB",
+            "retention": "30 days",
+            "compression": "zip",
+            "backtrace": True,
+            "diagnose": True,
+        },
+    ],
+}
+
+logger.configure(**LOGURU_LOGGING)
+
+LOGGING = {
+    "version":1,
+    "disable_existing_loggers":False,
+    "handlers":{"loguru":{"class":"interceptor.InterceptHandler"}},
+    "root": {"level":"DEBUG","handlers":["loguru"]},
+
+}
+
+
+
