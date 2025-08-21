@@ -5,7 +5,7 @@ from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
-
+    
 )
 
 urlpatterns = [
