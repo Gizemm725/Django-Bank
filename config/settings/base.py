@@ -182,12 +182,55 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "core_apps.common.cookie_auth.CookieAuthentication",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+     "DEFAULT_FILTER_BACKENDS":[
+        "django_filters.rest_framework.DjangoFilterBackend"
+     ],
+     "PAGE_SIZE": 10
+     "DEFAULT_THROTTLE_CLASSES":[
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.AnonRateThrottle",
+     ],
+     "DEFAULT_THROTTLE_RATES": {
+         "user": "100/day",
+         "anon": "50/day",
+     }
+}
+
+SIMPLE_JWT = {
+    "SIGNING_KEY": getenv("SIGNING_KEY"),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id", 
 }
 
 # CSRF muafiyeti için
 CSRF_EXEMPT_URLS = [
     r'^api/v1/.*$',  # Tüm API endpoint'leri için
 ]
+
+DJOSER = {
+    "USER_ID_FIELD" : "id",
+    "LOGIN_FIELD": "email",
+    "TOKEN_FIELD": None,
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    "SEND_ACTIVATION_EMAIL": True,
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    "PASSWORD_RESET_CONFIRM_RETYPE":True,
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "password-reset/{uid}/{token}",
+    "SERIALIZERS":{
+        "user_create":"core_apps.user_auth.serializers.UserCreateSerializer",
+    }
+}
 
 SPECTACULAR_SETTINGS = {
     "TITLE":"NextGen Bank API",
@@ -227,6 +270,17 @@ cloudinary.config(
     api_key=CLOUDINARY_API_KEY,
     api_secret=CLOUDINARY_API_SECRET
 )
+
+COOKIE_NAME = "access"
+
+COOKIE_SAMESITE = "Lax"
+
+COOKIE_PATH = "/"
+
+COOKIE_HTTPONLY = True
+
+COOKIE_SECURE = getenv("COOKIE_SECURE","True" ) == "True"
+
 
 LOGGING_CONFIG = None
 LOGURU_LOGGING = {

@@ -118,3 +118,4 @@ volumes:
   rabbitmq_data:
   rabbitmq_log:
   flower_db:
+  
