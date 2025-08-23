@@ -6,7 +6,12 @@ from os import getenv, path
 from loguru import logger 
 from datetime import timedelta 
 import cloudinary 
+from datetime import date
 
+DEFAULT_BIRTH_DATE = date(2000, 1, 1)  # İstediğin varsayılan tarih
+DEFAULT_COUNTRY = "TR" 
+DEFAULT_DATE = date(2000, 1, 1)
+DEFAULT_EXPIRY_DATE = date(2030, 12, 31)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
@@ -16,6 +21,15 @@ local_env_file=path.join(BASE_DIR, ".envs",".env.local")
 
 if path.isfile(local_env_file):
     load_dotenv(local_env_file)
+    
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8080',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:8080',
+    'http://localhost:5173',  # Vite default port
+    'http://127.0.0.1:5173',
+]
 
 
 # Application definition
@@ -41,6 +55,7 @@ THIRD_PARTY_APPS =[
     "django_filters",
     "djcelery_email",
     "django_celery_beat",
+    "corsheaders",
 
 ]
 
@@ -49,8 +64,21 @@ LOCAL_APPS=["core_apps.user_auth","core_apps.common","core_apps.user_profile"]
 INSTALLED_APPS= DJANGO_APPS+THIRD_PARTY_APPS+LOCAL_APPS
 ALLOWED_HOSTS = ["localhost", "127.0.0.1","0.0.0.0"]
 
+# CORS settings
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8080",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -148,7 +176,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "user_auth.User"
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS":"drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
 }
+
+# CSRF muafiyeti için
+CSRF_EXEMPT_URLS = [
+    r'^api/v1/.*$',  # Tüm API endpoint'leri için
+]
 
 SPECTACULAR_SETTINGS = {
     "TITLE":"NextGen Bank API",

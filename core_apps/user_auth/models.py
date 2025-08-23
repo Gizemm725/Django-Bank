@@ -51,6 +51,7 @@ class User(AbstractUser):
     middle_name = models.CharField(_("Middle Name"), max_length=50, blank=True, null=True)
     last_name = models.CharField(_("Last Name"), max_length=50)
     id_no = models.PositiveIntegerField(_("ID Number"), unique=True)
+    phone_number = models.CharField(_("Phone Number"), max_length=20, blank=True, null=True)
     account_status = models.CharField(
         _("Account Status"),
         max_length=10,
@@ -72,6 +73,7 @@ class User(AbstractUser):
         "id_no",
         "security_question",
         "security_answer",
+        "email",
     ]
 
     def set_otp(self, otp: str) -> None:

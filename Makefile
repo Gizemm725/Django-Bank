@@ -23,7 +23,7 @@ collectstatic:
 	docker compose -f local.yml run --rm api python manage.py collectstatic --no-input --clear
 
 superuser:
-	docker compose -f local.yml run --rm api python manage.py createsuperuser
+	docker compose -f local.yml exec api python manage.py createsuperuser
 
 flush:
 	docker compose -f local.yml run --rm api python manage.py flush
